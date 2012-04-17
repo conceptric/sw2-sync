@@ -1,17 +1,17 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_job_list.rb])
 FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures])
 
+def fixture_stream_helper(filename)
+  StringIO.new(File.read(File.join(FIXTURES, filename)))
+end
+
 describe RemoteJobsList do
   
-  let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
-    
-  describe "a very simple remote feed" do
-    let(:simple_test_target) { File.join(FIXTURES, 'sw2_simple_example.xml') }
-  
+  describe "a single simple job" do 
     before(:each) do
-      RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
-        File.read(File.join(simple_test_target))))
-      @job_list = RemoteJobsList.new(test_url)
+      RemoteXmlReader.should_receive(:open).once.
+      and_return(fixture_stream_helper('sw2_simple_example.xml'))
+      @job_list = RemoteJobsList.new('simple')
     end                                           
   
     describe ".new" do    
@@ -54,12 +54,10 @@ describe RemoteJobsList do
   end      
   
   describe "a more complex remote feed" do
-    let(:hard_test_target) { File.join(FIXTURES, 'sw2_harder_example.xml') }
-
     before(:each) do
-      RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
-        File.read(File.join(hard_test_target))))        
-      @multi_job_list = RemoteJobsList.new(test_url)
+      RemoteXmlReader.should_receive(:open).once.
+      and_return(fixture_stream_helper('sw2_harder_example.xml'))
+      @multi_job_list = RemoteJobsList.new('url')
     end
     
     describe ".to_hash" do
