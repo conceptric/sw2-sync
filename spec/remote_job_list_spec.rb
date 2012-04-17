@@ -1,12 +1,12 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_job_list.rb])
+FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures])
 
 describe RemoteJobsList do
   
   let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
     
   describe "a very simple remote feed" do
-    let(:simple_test_target) { File.join(File.dirname(__FILE__), 
-      *%w[fixtures sw2_simple_example.xml]) }
+    let(:simple_test_target) { File.join(FIXTURES, 'sw2_simple_example.xml') }
   
     before(:each) do
       RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
@@ -54,8 +54,7 @@ describe RemoteJobsList do
   end      
   
   describe "a more complex remote feed" do
-    let(:hard_test_target) { File.join(File.dirname(__FILE__), 
-      *%w[fixtures sw2_harder_example.xml]) } 
+    let(:hard_test_target) { File.join(FIXTURES, 'sw2_harder_example.xml') }
 
     before(:each) do
       RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
