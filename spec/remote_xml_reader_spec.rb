@@ -1,10 +1,11 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
+FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures])
 
 describe RemoteXmlReader do
 
   let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
   
-  describe ".fetch" do
+  describe ".open" do
     it "opens a remote url and reads the contents" do
       subject.should_receive(:open).
         once.
@@ -13,13 +14,13 @@ describe RemoteXmlReader do
         StringIO.new(File.read(File.join(File.dirname(__FILE__), 
           *%w[fixtures sw2_harder_example.xml])))
         )
-      subject.fetch(test_url)  
+      subject.open(test_url)  
     end    
   end  
 
   describe ".extract_named_nodes" do
     before(:each) do
-      subject.stub(:fetch).and_return(
+      subject.stub(:open).and_return(
         open(FIXTURES + '/sw2_harder_example.xml'))      
     end
 

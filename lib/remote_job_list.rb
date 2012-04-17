@@ -6,18 +6,9 @@ class RemoteJobsList
   include RemoteXmlReader
   
   def initialize(remote_url)
-    @xml = RemoteXmlReader.fetch(remote_url)
-    config_nori
+    @xml = RemoteXmlReader.open(remote_url)
   end
   
-  def to_hash
-    attributes = [] 
-    Nokogiri::XML(@xml).search('jobs').children.each do |job|
-      Nori.parse(job.to_xml).each {|key, value| attributes << value }
-    end
-    attributes
-  end    
-
   private 
   def config_nori
     Nori.configure do |config|
