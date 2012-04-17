@@ -1,42 +1,10 @@
 require 'rspec'
 require 'nori'
 require 'nokogiri'
+require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
+require File.join(File.dirname(__FILE__), *%w[.. lib remote_job_list.rb])
 
-module XmlStreamParser
-  def XmlStreamParser.fetch(remote_url)
-    open(remote_url).read
-  end
-end  
-
-class RemoteJobsList 
-  include XmlStreamParser
-  
-  def initialize(remote_url)
-    @xml = XmlStreamParser.fetch(remote_url)
-    config_nori
-  end
-  
-  def raw
-    @xml
-  end
-  
-  def to_hash
-    attributes = [] 
-    Nokogiri::XML(raw).search('jobs').children.each do |job|
-      Nori.parse(job.to_xml).each {|key, value| attributes << value }
-    end
-    attributes
-  end    
-
-  private 
-  def config_nori
-    Nori.configure do |config|
-      config.convert_tags_to { |tag| tag.to_sym }
-    end        
-  end      
-end
-
-describe XmlStreamParser do
+describe RemoteXmlReader do
   let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
   
   describe ".fetch" do
@@ -59,7 +27,7 @@ describe RemoteJobsList do
       *%w[fixtures sw2_simple_example.xml]) }
   
     before(:each) do
-      XmlStreamParser.should_receive(:open).once.and_return(StringIO.new(
+      RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
         File.read(File.join(simple_test_target))))
       @job_list = RemoteJobsList.new(test_url)
     end                                           
@@ -114,7 +82,7 @@ describe RemoteJobsList do
       *%w[fixtures sw2_harder_example.xml]) } 
 
     before(:each) do
-      XmlStreamParser.should_receive(:open).once.and_return(StringIO.new(
+      RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
         File.read(File.join(hard_test_target))))        
       @multi_job_list = RemoteJobsList.new(test_url)
     end
