@@ -1,21 +1,5 @@
-require 'rspec'
-require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_job_list.rb])
 
-describe RemoteXmlReader do
-  let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
-  
-  describe ".fetch" do
-    it "opens a remote url and reads the contents" do
-      subject.should_receive(:open).once.with(test_url).
-        and_return(StringIO.new(
-        File.read(File.join(File.dirname(__FILE__), 
-          *%w[fixtures sw2_simple_example.xml]))))
-      subject.fetch(test_url)  
-    end    
-  end  
-end
-  
 describe RemoteJobsList do
   
   let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
@@ -36,12 +20,6 @@ describe RemoteJobsList do
       end
     end  
 
-    describe ".raw" do
-      it "returns an xml document" do
-        @job_list.raw.should include('?xml version="1.0" encoding="ISO-8859-1"?')
-      end     
-    end
-  
     describe ".to_hash" do
       it "returns an array of attribute hashes" do
         attributes = @job_list.to_hash
@@ -83,12 +61,6 @@ describe RemoteJobsList do
       RemoteXmlReader.should_receive(:open).once.and_return(StringIO.new(
         File.read(File.join(hard_test_target))))        
       @multi_job_list = RemoteJobsList.new(test_url)
-    end
-
-    describe ".raw" do
-      it "returns an xml document" do
-        @multi_job_list.raw.should include('?xml version="1.0" encoding="ISO-8859-1"?')
-      end     
     end
     
     describe ".to_hash" do

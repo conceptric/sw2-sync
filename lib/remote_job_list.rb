@@ -1,5 +1,6 @@
 require 'nori'
-require 'nokogiri'
+require 'nokogiri'         
+require 'remote_xml_reader'
 
 class RemoteJobsList 
   include RemoteXmlReader
@@ -9,13 +10,9 @@ class RemoteJobsList
     config_nori
   end
   
-  def raw
-    @xml
-  end
-  
   def to_hash
     attributes = [] 
-    Nokogiri::XML(raw).search('jobs').children.each do |job|
+    Nokogiri::XML(@xml).search('jobs').children.each do |job|
       Nori.parse(job.to_xml).each {|key, value| attributes << value }
     end
     attributes
