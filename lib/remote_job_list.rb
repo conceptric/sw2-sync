@@ -1,3 +1,6 @@
+require 'nori'
+require 'nokogiri'
+
 class RemoteJobsList 
   include RemoteXmlReader
   

@@ -1,6 +1,4 @@
 require 'rspec'
-require 'nori'
-require 'nokogiri'
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_job_list.rb])
 
