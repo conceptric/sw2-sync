@@ -39,27 +39,28 @@ describe RemoteXmlReader do
     before(:each) do
       RemoteXmlReader.stub(:open).and_return(
         open(FIXTURES + '/sw2_harder_example.xml'))      
+      @remote_xml_reader = RemoteXmlReader.new('remote_url')
     end
   
     it "returns an array of nodes matching the name" do
-      result = RemoteXmlReader.extract_named_nodes('feed_url', 'item')
+      result = @remote_xml_reader.extract_named_nodes('item')
       result.should be_instance_of(Array)
       result.count.should == 2          
     end                                                        
     
     it "each of these data nodes are Nokogiri elements" do
-      result = RemoteXmlReader.extract_named_nodes('feed_url', 'item')
+      result = @remote_xml_reader.extract_named_nodes('item')
       result.first.should be_instance_of(Nokogiri::XML::Element)      
     end
   
     it "each element contains the correct amount of data" do
-      result = RemoteXmlReader.extract_named_nodes('feed_url', 'item')
+      result = @remote_xml_reader.extract_named_nodes('item')
       result.first.children.size.should == 29
       result.last.children.size.should == 29
     end
   
     it "each element contains the correct data" do
-      result = RemoteXmlReader.extract_named_nodes('feed_url', 'item')
+      result = @remote_xml_reader.extract_named_nodes('item')
       result.first.search('reference').text.should == '06468'
       result.last.search('reference').text.should == '06469'
     end

@@ -5,13 +5,6 @@ class RemoteXmlReader
     open(remote_url)
   end
 
-  def self.extract_named_nodes(remote_url, node_name)
-    nodes = []
-    doc = Nokogiri::XML(open(remote_url).read)
-    doc.search(node_name).each {|item| nodes << item }
-    nodes
-  end
-
   def initialize(remote_url)
     @remote_xml = RemoteXmlReader.open(remote_url).read
   end                               
@@ -19,6 +12,12 @@ class RemoteXmlReader
   def read
     @remote_xml
   end
-  
+
+  def extract_named_nodes(node_name)
+    nodes = []
+    doc = Nokogiri::XML(read)
+    doc.search(node_name).each {|item| nodes << item }
+    nodes
+  end  
 end  
 
