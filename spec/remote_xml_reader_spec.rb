@@ -10,12 +10,30 @@ describe RemoteXmlReader do
   let(:test_url) { 'http://www.job-tv.co.uk/XML.asp' }
   
   describe ".open" do
-    it "opens a remote url and reads the contents" do
+    it "opens a remote url" do
       RemoteXmlReader.should_receive(:open).once.and_return(
         fixture_stream_helper('sw2_harder_example.xml'))
-      RemoteXmlReader.open(test_url)  
+      RemoteXmlReader.open(test_url).read.
+          should == open(FIXTURES + '/sw2_harder_example.xml').read  
     end    
   end  
+
+  describe ".new" do
+    before(:each) do
+      RemoteXmlReader.stub(:open).and_return(
+        open(FIXTURES + '/sw2_harder_example.xml'))      
+    end
+
+    it "creates a new instance" do
+      RemoteXmlReader.new('remote_url').
+        should be_instance_of(RemoteXmlReader)      
+    end        
+
+    it "that contains the target xml" do
+      RemoteXmlReader.new('remote_url').read.
+        should == open(FIXTURES + '/sw2_harder_example.xml').read
+    end        
+  end
 
   describe ".extract_named_nodes" do
     before(:each) do
