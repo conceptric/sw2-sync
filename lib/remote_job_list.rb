@@ -2,11 +2,9 @@ require 'nori'
 require 'nokogiri'         
 require 'remote_xml_reader'
 
-class RemoteJobsList 
-  include RemoteXmlReader
-  
+class RemoteJobsList   
   def initialize(remote_url)
-    @xml = RemoteXmlReader.open(remote_url)
+    # @xml = RemoteXmlReader.open(remote_url)
   end
   
   private 
