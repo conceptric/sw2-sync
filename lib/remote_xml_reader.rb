@@ -14,10 +14,25 @@ class RemoteXmlReader
   end
 
   def extract_named_nodes(node_name)
-    nodes = []
-    doc = Nokogiri::XML(read)
-    doc.search(node_name).each {|item| nodes << item }
-    nodes
-  end  
+    Nokogiri::XML(read).search(node_name).to_a
+  end                       
+  
+  def named_nodes_to_hash(node_name)      
+    out = []
+    extract_named_nodes(node_name).each do |named_node|
+      out << children_to_hash(named_node)
+    end
+    out
+  end
+
+  private  
+  def children_to_hash(node)
+    attributes = {}
+    node.element_children.each do |element|
+      attributes[element.node_name.to_sym] = element.text
+    end
+    attributes    
+  end
+
 end  
 
