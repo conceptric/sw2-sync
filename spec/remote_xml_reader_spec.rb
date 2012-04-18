@@ -9,7 +9,7 @@ describe RemoteXmlReader do
 
   let(:test_url) { 'http://www.example.com/example.xml' }
   
-  describe ".open" do
+  describe "RemoteXmlReader.open" do
     it "opens a remote url" do
       RemoteXmlReader.should_receive(:open).once.and_return(
         fixture_stream_helper('single_node.xml'))
@@ -18,10 +18,11 @@ describe RemoteXmlReader do
     end    
   end  
 
-  describe ".new" do
-    before(:each) do
-      RemoteXmlReader.stub(:open).and_return(
-        open(FIXTURES + '/single_node.xml'))      
+  describe ".new" do      
+    
+    before(:each) do  
+      xml_file = open(FIXTURES + '/single_node.xml')
+      RemoteXmlReader.stub(:open).and_return(xml_file)      
     end
 
     it "creates a new instance" do
@@ -30,8 +31,9 @@ describe RemoteXmlReader do
     end        
 
     it "that contains the target xml" do
+      xml_file = open(FIXTURES + '/single_node.xml')
       RemoteXmlReader.new('remote_url').read.
-        should == open(FIXTURES + '/single_node.xml').read
+        should == xml_file.read
     end        
   end
 
