@@ -29,7 +29,9 @@ class RemoteXmlReader
   def children_to_hash(node)
     attributes = {}
     node.element_children.each do |element|
-      attributes[element.node_name.to_sym] = element.text
+      if element.element_children.empty? then
+        attributes[element.node_name.to_sym] = element.text
+      end
     end
     attributes    
   end

@@ -92,6 +92,17 @@ describe RemoteXmlReader do
         {child1: "value1", child2: "value2"},
         {child1: "value1", child2: "value2"}]
     end
+
+    it "the hash is not recursive" do 
+      RemoteXmlReader.stub(:open).and_return(
+        open(FIXTURES + '/complex_twin_node.xml'))      
+      remote_reader = RemoteXmlReader.new("remote_url")
+      result = remote_reader.named_nodes_to_hash("item")
+      result.should == [
+        {child1: "value1", child2: "value2"},
+        {child1: "value1", child2: "CDATA is included\nwith special characters"},
+        {child1: "value1", child2: "value2"}]
+    end
   end
 end
   

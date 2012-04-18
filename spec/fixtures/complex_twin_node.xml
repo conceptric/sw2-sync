@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<jobs>
+  <item>
+    <child1>value1</child1>
+    <child2>value2</child2>
+	</item>
+  <item>
+    <child1>value1</child1>
+    <child2><![CDATA[CDATA is included
+with special characters]]></child2>
+	</item>
+  <item>
+    <child1>value1</child1>
+    <child2>value2</child2>
+    <child3>
+			<subchild1>should not be used</subchild1>
+			<subchild2>should not be used</subchild2>
+		</child3>
+	</item>
+</jobs?
