@@ -9,6 +9,11 @@ end
 
 describe RemoteXmlReader do
 
+  def xml_stub(filename)
+    xml_file = open(FIXTURES + '/' + filename)
+    RemoteXmlReader.stub(:open).and_return(xml_file)            
+  end
+
   describe "RemoteXmlReader.open" do
     
     context "a remote url that exists" do
@@ -56,11 +61,6 @@ describe RemoteXmlReader do
 
   describe ".new" do      
     
-    def xml_stub(filename)
-      xml_file = open(FIXTURES + '/' + filename)
-      RemoteXmlReader.stub(:open).and_return(xml_file)            
-    end
-    
     shared_examples "a new XML Reader" do |example_xml_file|      
       it "creates a new instance" do
         xml_stub(example_xml_file)
@@ -90,11 +90,6 @@ describe RemoteXmlReader do
   end
 
   describe ".extract_named_nodes" do
-
-    def xml_stub(filename)
-      xml_file = open(FIXTURES + '/' + filename)
-      RemoteXmlReader.stub(:open).and_return(xml_file)            
-    end
 
     def remote_reader_setup(filename)
       xml_stub(filename)
