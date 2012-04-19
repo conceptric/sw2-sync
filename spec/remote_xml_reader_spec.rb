@@ -1,16 +1,14 @@
-require "rexml/document"
-
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
-FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures])
+XML_FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures xml])
 
 def fixture_stream_helper(filename)
-  StringIO.new(File.read(File.join(FIXTURES, filename)))
+  StringIO.new(File.read(File.join(XML_FIXTURES, filename)))
 end
 
 describe RemoteXmlReader do
 
   def xml_stub(filename)
-    xml_file = open(FIXTURES + '/' + filename)
+    xml_file = open(XML_FIXTURES + '/' + filename)
     RemoteXmlReader.stub(:open).and_return(xml_file)            
   end
 
@@ -27,7 +25,7 @@ describe RemoteXmlReader do
           fixture_stream_helper('single_node.xml'))
 
         RemoteXmlReader.open(test_url).read.
-            should == open(FIXTURES + '/single_node.xml').read  
+            should == open(XML_FIXTURES + '/single_node.xml').read  
       end
       
       it "opens the remote url to a blank document" do
@@ -70,7 +68,7 @@ describe RemoteXmlReader do
 
       it "that contains the target xml" do
         xml_stub(example_xml_file)
-        xml_file = open(FIXTURES + '/' + example_xml_file)
+        xml_file = open(XML_FIXTURES + '/' + example_xml_file)
         RemoteXmlReader.new('remote_url').read.
           should == xml_file.read
       end
@@ -150,37 +148,59 @@ describe RemoteXmlReader do
     
   end 
   
-  describe ".named_nodes_to_hash" do
+  describe ".child_nodes_to_hash" do
     
     def setup(actual_xml_file)
       RemoteXmlReader.stub(:open).and_return(
-        open(FIXTURES + '/' + actual_xml_file))      
+        open(XML_FIXTURES + '/' + actual_xml_file))      
       remote_reader = RemoteXmlReader.new("remote_url")
-      remote_reader.named_nodes_to_hash("jobs")
+      remote_reader.child_nodes_to_hash("jobs")
     end
-
-    it "converts the children of a named node to a hash" do 
-      result = setup('single_node.xml')
-      result.should == [{child1: "value1", child2: "value2"}]
-    end
-
-    it "converts the children of two named node to a hashes" do 
-      result = setup('twin_node.xml')
-      result.should == [
-        {child1: "value1", child2: "value2"},
-        {child1: "value1", child2: "value2"}]
-    end
-
-    it "the hash is recursive" do 
-      result = setup('complex_node.xml')
-      result.should == [
-        {child1: "value1", child2: "value2"},
-        {child1: "value1", child2: "CDATA is included\nwith special characters"},
-        {child1: "value1", child2: "value2"},
-        {},
-        {child1: "value1", child2: "value2"}]
-    end                           
     
+    context "given an array of valid nokogiri nodes" do
+      it "converts the children of a named node to a hash" do 
+        result = setup('single_node.xml')
+        result.should == [{child1: "value1", child2: "value2"}]
+      end
+
+      it "converts the children of two named node to a hashes" do 
+        result = setup('twin_node.xml')
+        result.should == [
+          {child1: "value1", child2: "value2"},
+          {child1: "value1", child2: "value2"}]
+      end
+
+      it "includes CDATA with special formatting characters" do 
+        result = setup('complex_node.xml')
+        result.should include(
+          { child1: "value1", 
+            child2: "CDATA is included\nwith special characters" }        
+        )
+      end                                 
+    end
+                                    
+    context "given an array of nodes with nested elements" do
+       it "ignores nested elements within each child" do 
+         result = setup('complex_node.xml')
+         result.should_not include(
+           { subchild1: "should be ignored", 
+             subchild2: "should be ignored" })
+       end                           
+       
+       it "ignores child nodes with no elements" do
+         result = setup('complex_node.xml')
+         result.should_not include('This is not a valid child node')
+         result.should_not include({})
+         result.size.should == 4
+       end                                     
+       
+       it "includes the children of nested parents" do
+         result = setup('complex_node.xml')
+         result.should include(
+           { child1: "should be included", 
+             child2: "should be included" })         
+       end       
+    end    
   end
   
 end

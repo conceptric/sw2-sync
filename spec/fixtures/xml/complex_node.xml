@@ -12,17 +12,17 @@ with special characters]]></child2>
 		</item>
 	  <item>
 			<jobs>
-				<item>This is an attribute, not the named node</item>
+				<item>This is not a valid child node</item>
 				<item>
-			    <child1>value1</child1>
-			    <child2>value2</child2>				
+			    <child1>should be included</child1>
+			    <child2>should be included</child2>				
 				</item>
 			</jobs>
 	    <child1>value1</child1>
 	    <child2>value2</child2>
 	    <child3>
-				<subchild1>should not be used</subchild1>
-				<subchild2>should not be used</subchild2>
+				<subchild1>should be ignored</subchild1>
+				<subchild2>should be ignored</subchild2>
 			</child3>
 		</item>
 	</jobs>
