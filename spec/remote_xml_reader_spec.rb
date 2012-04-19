@@ -1,3 +1,5 @@
+require "rexml/document"
+
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
 FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures])
 
@@ -54,22 +56,37 @@ describe RemoteXmlReader do
 
   describe ".new" do      
     
-    before(:each) do  
-      xml_file = open(FIXTURES + '/single_node.xml')
-      RemoteXmlReader.stub(:open).and_return(xml_file)      
-    end
-
-    it "creates a new instance" do
-      RemoteXmlReader.new('remote_url').
-        should be_instance_of(RemoteXmlReader)      
-    end        
-
-    it "that contains the target xml" do
-      xml_file = open(FIXTURES + '/single_node.xml')
-      RemoteXmlReader.new('remote_url').read.
-        should == xml_file.read
+    def xml_stub(filename)
+      xml_file = open(FIXTURES + '/' + filename)
+      RemoteXmlReader.stub(:open).and_return(xml_file)            
     end
     
+    shared_examples "a new XML Reader" do |example_xml_file|      
+      it "creates a new instance" do
+        xml_stub(example_xml_file)
+        RemoteXmlReader.new('remote_url').
+          should be_instance_of(RemoteXmlReader)      
+      end        
+
+      it "that contains the target xml" do
+        xml_stub(example_xml_file)
+        xml_file = open(FIXTURES + '/' + example_xml_file)
+        RemoteXmlReader.new('remote_url').read.
+          should == xml_file.read
+      end
+    end
+    
+    context "given a remote url to valid xml" do
+      include_examples "a new XML Reader", 'single_node.xml'
+    end
+    
+    context "given a remote url to empty xml" do
+      include_examples "a new XML Reader", 'blank_document.xml'
+    end
+
+    context "given a remote url to an empty file" do
+      include_examples "a new XML Reader", 'empty.xml'
+    end
   end
 
   describe ".extract_named_nodes" do
