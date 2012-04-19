@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<jobs>
+  <item>
+    <reference></reference>
+    <title></title>
+    <category></category>
+    <jobtype></jobtype>
+    <startdate></startdate>
+    <enddate></enddate>
+    <duration></duration>
+    <pubDate></pubDate>
+		<salary></salary>
+    <location></location>
+    <joboftheweek>0</joboftheweek>
+    <contactname></contactname>
+    <contactemail></contactemail>
+    <description><![CDATA[]]></description>
+  </item>
+  <item>
+    <reference/>
+    <title/>
+    <category/>
+    <jobtype/>
+    <startdate/>
+    <enddate/>
+    <duration/>
+    <pubDate/>
+		<salary/>
+    <location/>
+    <joboftheweek/>
+    <contactname/>
+    <contactemail/>
+    <description/>
+  </item>
+</jobs>
