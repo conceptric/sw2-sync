@@ -90,35 +90,45 @@ describe RemoteXmlReader do
   end
 
   describe ".extract_named_nodes" do
-    
-    before(:each) do
-      RemoteXmlReader.stub(:open).and_return(
-        open(FIXTURES + '/twin_node.xml'))      
+
+    def xml_stub(filename)
+      xml_file = open(FIXTURES + '/' + filename)
+      RemoteXmlReader.stub(:open).and_return(xml_file)            
+    end
+
+    def remote_reader_setup(filename)
+      xml_stub(filename)
       remote_xml_reader = RemoteXmlReader.new('remote_url')
-      @result = remote_xml_reader.extract_named_nodes('item')
+      remote_xml_reader.extract_named_nodes('item')
     end
-  
-    it "returns an array containing matching nodes" do
-      @result.size.should == 2
-    end                                                        
     
-    it "each of these data nodes are Nokogiri elements" do
-      @result.each do |item|
-        item.should be_instance_of(Nokogiri::XML::Element)
+    context "given a file with valid xml" do
+      before(:each) do
+        @result = remote_reader_setup('/twin_node.xml')
       end
-    end
   
-    it "each element contains the correct amount of data" do
-      @result.each do |item|
-        item.children.count.should == 5
+      it "returns an array containing matching nodes" do
+        @result.size.should == 2
+      end                                                        
+    
+      it "each of these data nodes are Nokogiri elements" do
+        @result.each do |item|
+          item.should be_instance_of(Nokogiri::XML::Element)
+        end
       end
-    end
   
-    it "each element contains the correct data" do
-      @result.each do |item|
-        item.node_name == "item"
-        item.first_element_child.node_name.should == 'child1'
-        item.last_element_child.node_name.should == 'child2'
+      it "each element contains the correct amount of data" do
+        @result.each do |item|                     
+          item.children.count.should == 5
+        end
+      end
+  
+      it "each element contains the correct data" do
+        @result.each do |item|
+          item.node_name == "item"
+          item.first_element_child.node_name.should == 'child1'
+          item.last_element_child.node_name.should == 'child2'
+        end
       end
     end
     
@@ -146,11 +156,12 @@ describe RemoteXmlReader do
     end
 
     it "the hash is not recursive" do 
-      result = setup('complex_twin_node.xml')
+      result = setup('complex_node.xml')
       result.should == [
         {child1: "value1", child2: "value2"},
         {child1: "value1", child2: "CDATA is included\nwith special characters"},
-        {child1: "value1", child2: "value2"}]
+        {item: "This is an attribute, not the named node", 
+         child1: "value1", child2: "value2"}, {}]
     end                           
     
   end

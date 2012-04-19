@@ -10,6 +10,7 @@
 with special characters]]></child2>
 	</item>
   <item>
+		<item>This is an attribute, not the named node</item>
     <child1>value1</child1>
     <child2>value2</child2>
     <child3>
