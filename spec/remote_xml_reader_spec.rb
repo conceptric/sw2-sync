@@ -1,17 +1,25 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_xml_reader.rb])
 XML_FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures xml])
 
-def fixture_stream_helper(filename)
-  StringIO.new(File.read(File.join(XML_FIXTURES, filename)))
-end
-
-describe RemoteXmlReader do
+module XmlTestHelpers
+  def fixture_stream_helper(filename)
+    StringIO.new(File.read(File.join(XML_FIXTURES, filename)))
+  end
 
   def xml_stub(filename)
     xml_file = open(XML_FIXTURES + '/' + filename)
     RemoteXmlReader.stub(:open).and_return(xml_file)            
   end
 
+  def remote_reader_factory(filename)
+    xml_stub(filename)
+    RemoteXmlReader.new('remote_url')
+  end
+end  
+
+describe RemoteXmlReader do
+  include XmlTestHelpers
+  
   describe "RemoteXmlReader.open" do
     
     context "a remote url that exists" do
@@ -88,12 +96,10 @@ describe RemoteXmlReader do
   end
 
   describe ".children_of_named_node" do
-
+    
     def remote_reader_setup(filename)
-      xml_stub(filename)
-      remote_xml_reader = RemoteXmlReader.new('remote_url')
-      remote_xml_reader.children_of_named_node('jobs')
-    end
+      remote_reader_factory(filename).children_of_named_node('jobs')      
+    end                                               
     
     context "given a file with valid xml" do
       before(:each) do
@@ -149,29 +155,26 @@ describe RemoteXmlReader do
   end 
   
   describe ".child_nodes_to_hash" do
-    
-    def setup(actual_xml_file)
-      RemoteXmlReader.stub(:open).and_return(
-        open(XML_FIXTURES + '/' + actual_xml_file))      
-      remote_reader = RemoteXmlReader.new("remote_url")
-      remote_reader.child_nodes_to_hash("jobs")
+  
+    def hash_reader_setup(filename)
+      remote_reader_factory(filename).child_nodes_to_hash("jobs")
     end
-    
+        
     context "given an array of valid nokogiri nodes" do
       it "converts the children of a named node to a hash" do 
-        result = setup('single_node.xml')
+        result = hash_reader_setup('single_node.xml')
         result.should == [{child1: "value1", child2: "value2"}]
       end
 
       it "converts the children of two named node to a hashes" do 
-        result = setup('twin_node.xml')
+        result = hash_reader_setup('twin_node.xml')
         result.should == [
           {child1: "value1", child2: "value2"},
           {child1: "value1", child2: "value2"}]
       end
 
       it "includes CDATA with special formatting characters" do 
-        result = setup('complex_node.xml')
+        result = hash_reader_setup('complex_node.xml')
         result.should include(
           { child1: "value1", 
             child2: "CDATA is included\nwith special characters" }        
@@ -181,21 +184,21 @@ describe RemoteXmlReader do
                                     
     context "given an array of nodes with nested elements" do
        it "ignores nested elements within each child" do 
-         result = setup('complex_node.xml')
+         result = hash_reader_setup('complex_node.xml')
          result.should_not include(
            { subchild1: "should be ignored", 
              subchild2: "should be ignored" })
        end                           
        
        it "ignores child nodes with no elements" do
-         result = setup('complex_node.xml')
+         result = hash_reader_setup('complex_node.xml')
          result.should_not include('This is not a valid child node')
          result.should_not include({})
          result.size.should == 4
        end                                     
        
        it "includes the children of nested parents" do
-         result = setup('complex_node.xml')
+         result = hash_reader_setup('complex_node.xml')
          result.should include(
            { child1: "should be included", 
              child2: "should be included" })         
