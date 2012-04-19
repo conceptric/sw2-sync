@@ -22,6 +22,15 @@ describe RemoteXmlReader do
         RemoteXmlReader.open(test_url).read.
             should == open(FIXTURES + '/single_node.xml').read  
       end
+      
+      it "opens the remote url to a blank document" do
+        RemoteXmlReader.should_receive(:open).
+        and_return(
+          fixture_stream_helper('blank_document.xml'))
+
+        expect { RemoteXmlReader.open('blank') }.
+          should_not raise_error
+      end
     end
 
     context "a remote url that does not exist" do
