@@ -9,19 +9,38 @@ describe RemoteXmlReader do
 
   describe "RemoteXmlReader.open" do
     
-    it "opens a remote url" do
-      test_url = 'http://www.example.com/example.xml'
+    context "a remote url that exists" do
+      it "opens a remote url" do
+        test_url = 'http://www.example.com/example.xml'
 
-      RemoteXmlReader.should_receive(:open).
-      once.
-      with(test_url).
-      and_return(
-        fixture_stream_helper('single_node.xml'))
+        RemoteXmlReader.should_receive(:open).
+        once.
+        with(test_url).
+        and_return(
+          fixture_stream_helper('single_node.xml'))
 
-      RemoteXmlReader.open(test_url).read.
-          should == open(FIXTURES + '/single_node.xml').read  
+        RemoteXmlReader.open(test_url).read.
+            should == open(FIXTURES + '/single_node.xml').read  
+      end
     end
-        
+
+    context "a remote url that does not exist" do
+      it "raises an exception with a message about the invalid url" do
+        expect { RemoteXmlReader.open('invalid') }.
+          to raise_error(ArgumentError, "This URI is invalid")
+      end
+
+      it "raises an exception with a message about a nil url" do
+        expect { RemoteXmlReader.open(nil) }.
+          to raise_error(ArgumentError, "A URI is required")
+      end
+
+      it "raises an exception with a message about a blank url" do
+        expect { RemoteXmlReader.open('') }.
+          to raise_error(ArgumentError, "This URI is invalid")
+      end
+    end
+    
   end  
 
   describe ".new" do      
