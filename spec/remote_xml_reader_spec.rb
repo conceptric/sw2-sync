@@ -89,12 +89,12 @@ describe RemoteXmlReader do
     end
   end
 
-  describe ".extract_named_nodes" do
+  describe ".children_of_named_node" do
 
     def remote_reader_setup(filename)
       xml_stub(filename)
       remote_xml_reader = RemoteXmlReader.new('remote_url')
-      remote_xml_reader.extract_named_nodes('item')
+      remote_xml_reader.children_of_named_node('jobs')
     end
     
     context "given a file with valid xml" do
@@ -140,6 +140,13 @@ describe RemoteXmlReader do
           should == []
       end             
     end
+
+    context "given complex xml with named elements nested" do
+      it "returns an array named elements recursively" do
+        remote_reader_setup('complex_node.xml').size.
+          should == 5
+      end             
+    end
     
   end 
   
@@ -149,7 +156,7 @@ describe RemoteXmlReader do
       RemoteXmlReader.stub(:open).and_return(
         open(FIXTURES + '/' + actual_xml_file))      
       remote_reader = RemoteXmlReader.new("remote_url")
-      remote_reader.named_nodes_to_hash("item")
+      remote_reader.named_nodes_to_hash("jobs")
     end
 
     it "converts the children of a named node to a hash" do 
@@ -164,13 +171,14 @@ describe RemoteXmlReader do
         {child1: "value1", child2: "value2"}]
     end
 
-    it "the hash is not recursive" do 
+    it "the hash is recursive" do 
       result = setup('complex_node.xml')
       result.should == [
         {child1: "value1", child2: "value2"},
         {child1: "value1", child2: "CDATA is included\nwith special characters"},
-        {item: "This is an attribute, not the named node", 
-         child1: "value1", child2: "value2"}, {}]
+        {child1: "value1", child2: "value2"},
+        {},
+        {child1: "value1", child2: "value2"}]
     end                           
     
   end

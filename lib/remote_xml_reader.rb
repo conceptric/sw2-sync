@@ -18,13 +18,13 @@ class RemoteXmlReader
     @remote_xml
   end
 
-  def extract_named_nodes(node_name)
-    Nokogiri::XML(read).search(node_name).to_a
+  def children_of_named_node(node_name)
+    Nokogiri::XML(read).xpath("//#{node_name}/*").to_a
   end                       
-  
+      
   def named_nodes_to_hash(node_name)      
     out = []
-    extract_named_nodes(node_name).each do |named_node|
+    children_of_named_node(node_name).each do |named_node|
       out << children_to_hash(named_node)
     end
     out

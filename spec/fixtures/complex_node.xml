@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<jobs>
-  <item>
-    <child1>value1</child1>
-    <child2>value2</child2>
-	</item>
-  <item>
-    <child1>value1</child1>
-    <child2><![CDATA[CDATA is included
+<name>
+	<jobs>
+	  <item>
+	    <child1>value1</child1>
+	    <child2>value2</child2>
+		</item>
+	  <item>
+	    <child1>value1</child1>
+	    <child2><![CDATA[CDATA is included
 with special characters]]></child2>
-	</item>
-  <item>
-		<item>This is an attribute, not the named node</item>
-    <child1>value1</child1>
-    <child2>value2</child2>
-    <child3>
-			<subchild1>should not be used</subchild1>
-			<subchild2>should not be used</subchild2>
-		</child3>
-	</item>
-</jobs?
+		</item>
+	  <item>
+			<jobs>
+				<item>This is an attribute, not the named node</item>
+				<item>
+			    <child1>value1</child1>
+			    <child2>value2</child2>				
+				</item>
+			</jobs>
+	    <child1>value1</child1>
+	    <child2>value2</child2>
+	    <child3>
+				<subchild1>should not be used</subchild1>
+				<subchild2>should not be used</subchild2>
+			</child3>
+		</item>
+	</jobs>
+</name>
