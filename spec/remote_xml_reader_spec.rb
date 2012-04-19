@@ -132,6 +132,20 @@ describe RemoteXmlReader do
       end
     end
     
+    context "given a blank xml file" do
+      it "returns an empty array" do
+        remote_reader_setup('blank_document.xml').
+          should == []
+      end             
+    end
+
+    context "given a completely empty file" do
+      it "returns an empty array" do
+        remote_reader_setup('empty.xml').
+          should == []
+      end             
+    end
+    
   end 
   
   describe ".named_nodes_to_hash" do
