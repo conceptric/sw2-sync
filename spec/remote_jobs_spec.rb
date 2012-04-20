@@ -3,15 +3,13 @@ require File.join(File.dirname(__FILE__), *%w[.. lib remote_jobs.rb])
 class MockJob
   include RemoteJobs
   
-  def self.find_with_reference
+  def self.find
     [] << self.new
   end
 end
 
 class MockNoJob
-  include RemoteJobs
-  
-  def self.find_with_reference
+  def self.find
     []
   end
 end
@@ -19,7 +17,7 @@ end
 describe RemoteJobs do
   
   describe ".find_jobs_to_sync" do    
-    subject { MockJob.find_jobs_to_sync }
+    subject { MockJob.find_jobs_to_sync { MockJob.find } }
     
     it "returns an array" do      
       subject.should be_instance_of Array
@@ -33,7 +31,7 @@ describe RemoteJobs do
     end
 
     context "when there aren't any jobs to sync" do
-      subject { MockNoJob.find_jobs_to_sync }
+      subject { MockJob.find_jobs_to_sync  { MockNoJob.find } }
       
       it "of jobs to be synchronised with the remote source" do            
         subject.size.should == 0

@@ -1,7 +1,7 @@
 module RemoteJobs
   module ClassMethods
-    def find_jobs_to_sync
-      self.find_with_reference
+    def find_jobs_to_sync(&block)
+      yield
     end    
   end
   
