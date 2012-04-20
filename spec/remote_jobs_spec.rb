@@ -25,6 +25,26 @@ class MockEmptyRemoteXmlReader
   end  
 end
 
+describe RemoteJobs do
+
+  describe "Jobs that exist remotely but not locally" do
+    it "create a new job using the remote attributes"
+  end
+    
+  describe "Jobs that exist remotely and locally" do
+    it "update the existing job using the remote attributes"
+  end                                      
+
+  describe "Remote attributes cause validation errors" do
+    it "leaves the local job unchanged and writes an error to the log"
+  end
+
+  describe "Jobs that no longer exist in the remote source" do
+    it "mark the job as not to be published"
+  end
+  
+end
+
 describe "RemoteJobs Interfaces" do
 
   describe ".find_jobs_to_sync" do    
