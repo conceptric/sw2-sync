@@ -40,9 +40,13 @@ describe RemoteJobs do
 
   describe "Jobs that exist remotely but not locally" do
 
-    def stub_jobs(job_array)
+    def stub_remote_jobs(how_many)
+      jobs = []
+      how_many.times do |i| 
+        jobs << {reference:"#{i+1}", title: 'job title'}
+      end
       MockJob.stub(:find_remote_jobs).
-        and_return(job_array)      
+        and_return(jobs)      
     end
     
     before(:each) do
@@ -51,7 +55,7 @@ describe RemoteJobs do
     end            
     
     it "create a new job using the remote attributes" do
-      stub_jobs([{reference:'1', title: 'job title'}])
+      stub_remote_jobs(1)
       MockJob.sync_with('remote_url') { MockJob.find }
       jobs = MockJob.find
       jobs.size.should == 1
@@ -60,8 +64,7 @@ describe RemoteJobs do
     end
 
     it "create two new jobs using the remote attributes" do
-      stub_jobs([ {reference:'1', title: 'job title'},
-                  {reference:'2', title: 'job title'} ])
+      stub_remote_jobs(2)
       MockJob.sync_with('remote_url') { MockJob.find }
       jobs = MockJob.find
       jobs.size.should == 2
