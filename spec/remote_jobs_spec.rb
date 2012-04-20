@@ -1,14 +1,13 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_jobs.rb])
-
 class MockJob
   include RemoteJobs
-  
+
   def self.find
     [] << self.new
   end
 end
 
-class MockNoJob
+class MockNoJob < MockJob
   def self.find
     []
   end  
@@ -26,7 +25,7 @@ class MockEmptyRemoteXmlReader
   end  
 end
 
-describe RemoteJobs do
+describe "RemoteJobs Interfaces" do
 
   describe ".find_jobs_to_sync" do    
     subject { MockJob.find_jobs_to_sync { MockJob.find } }
@@ -65,7 +64,7 @@ describe RemoteJobs do
     end
 
     context "when there are remote jobs" do
-      it "of jobs to be synchronised with the local database" do            
+      it "of job attributes to be synchronised with the local database" do            
         subject.size.should_not == 0
         subject.each {|job| job.should be_instance_of Hash}
       end
@@ -81,6 +80,7 @@ describe RemoteJobs do
         subject.size.should == 0
       end
     end    
+
   end  
  
 end
