@@ -1,16 +1,27 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_jobs.rb])
-class MockJob
+
+class MockJob                             
   include RemoteJobs
 
-  def self.find
-    [] << self.new
+  @@jobs = []
+    
+  attr_reader :attributes
+  
+  def initialize(attributes)
+    @attributes = attributes
   end
-end
 
-class MockNoJob < MockJob
   def self.find
-    []
-  end  
+    @@jobs
+  end
+  
+  def self.create(attributes)
+    @@jobs << self.new(attributes)
+  end    
+
+  def self.reset
+    @@jobs = []
+  end
 end
 
 class MockRemoteXmlReader  
@@ -28,7 +39,35 @@ end
 describe RemoteJobs do
 
   describe "Jobs that exist remotely but not locally" do
-    it "create a new job using the remote attributes"
+
+    def stub_jobs(job_array)
+      MockJob.stub(:find_remote_jobs).
+        and_return(job_array)      
+    end
+    
+    before(:each) do
+      MockJob.reset
+      MockJob.find.size.should == 0 
+    end            
+    
+    it "create a new job using the remote attributes" do
+      stub_jobs([{reference:'1', title: 'job title'}])
+      MockJob.sync_with('remote_url') { MockJob.find }
+      jobs = MockJob.find
+      jobs.size.should == 1
+      jobs.first.attributes.
+        should == {reference:'1', title: 'job title'}
+    end
+
+    it "create two new jobs using the remote attributes" do
+      stub_jobs([ {reference:'1', title: 'job title'},
+                  {reference:'2', title: 'job title'} ])
+      MockJob.sync_with('remote_url') { MockJob.find }
+      jobs = MockJob.find
+      jobs.size.should == 2
+      jobs.first.attributes.should == {reference:'1', title: 'job title'}
+      jobs.last.attributes.should == {reference:'2', title: 'job title'}
+    end
   end
     
   describe "Jobs that exist remotely and locally" do
@@ -47,7 +86,7 @@ end
 
 describe "RemoteJobs Interfaces" do
 
-  describe ".find_jobs_to_sync" do    
+  describe ".find_jobs_to_sync" do                   
     subject { MockJob.find_jobs_to_sync { MockJob.find } }
     
     it "returns an array" do      
@@ -56,15 +95,17 @@ describe "RemoteJobs Interfaces" do
     
     context "when there are jobs to sync" do
       it "of jobs to be synchronised with the remote source" do            
+        MockJob.create({})
         subject.size.should_not == 0
         subject.each {|job| job.should be_instance_of MockJob}
       end
     end
 
     context "when there aren't any jobs to sync" do
-      subject { MockJob.find_jobs_to_sync  { MockNoJob.find } }
+      subject { MockJob.find_jobs_to_sync  { MockJob.find } }
       
       it "returns an empty array" do            
+        MockJob.reset
         subject.size.should == 0
       end
     end
