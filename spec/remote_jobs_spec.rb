@@ -70,7 +70,8 @@ describe RemoteJobs do
       jobs.size.should == 2
       jobs.first.attributes.should == {reference:'1', title: 'job title'}
       jobs.last.attributes.should == {reference:'2', title: 'job title'}
-    end
+    end                                                     
+    
   end
     
   describe "Jobs that exist remotely and locally" do
@@ -89,8 +90,14 @@ end
 
 describe "RemoteJobs Interfaces" do
 
-  describe ".find_jobs_to_sync" do                   
+  describe ".find_jobs_to_sync" do
+                       
     subject { MockJob.find_jobs_to_sync { MockJob.find } }
+
+    before(:each) do
+      MockJob.reset
+      MockJob.find.size.should == 0 
+    end            
     
     it "returns an array" do      
       subject.should be_instance_of Array
@@ -108,21 +115,21 @@ describe "RemoteJobs Interfaces" do
       subject { MockJob.find_jobs_to_sync  { MockJob.find } }
       
       it "returns an empty array" do            
-        MockJob.reset
         subject.size.should == 0
       end
     end
+    
   end
   
   describe ".find_remote_jobs" do
+
+    subject { MockJob.find_remote_jobs('remote_url') }
 
     before(:each) do 
       RemoteXmlReader.stub(:new).with('remote_url').
         and_return(MockRemoteXmlReader.new)            
     end
-
-    subject { MockJob.find_remote_jobs('remote_url') }
-        
+    
     it "takes a remote url and returns an array" do
       subject.should be_instance_of Array 
     end
