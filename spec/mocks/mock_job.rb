@@ -20,6 +20,12 @@ class MockJob
     @@jobs.first.attributes = attributes
   end
 
+  def self.find_jobs_with_reference
+    remote_jobs = []
+    @@jobs.each {|job| remote_jobs << job unless job.reference == nil }
+    remote_jobs    
+  end
+
   def self.find_by_reference(id)
     referenced_job = nil
     @@jobs.each {|job| referenced_job = job if job.reference == id }

@@ -11,20 +11,23 @@ describe RemoteJobs do
       and_return(jobs)      
   end
 
-  def local_jobs_fixtures(how_many)
+  def local_jobs_fixtures(how_many_sync, how_many_static=0)
     jobs = []
-    how_many.times do |i| 
+    how_many_sync.times do |i| 
       MockJob.create({ reference: "#{i+1}", title: "job title #{i+2}" })
+    end
+    how_many_static.times do |i| 
+      MockJob.create({ reference: nil, title: "static job title #{i+1}" })
     end
   end
 
-  def update_setup(how_many_remote, how_many_local)
+  def update_setup(how_many_remote, how_many_local, how_many_static=0)
     stub_remote_jobs(how_many_remote)
-    local_jobs_fixtures(how_many_local)                                      
+    local_jobs_fixtures(how_many_local, how_many_static)                                      
   end
   
   def verify_test_database(number=1)
-    existing_jobs = MockJob.find
+    existing_jobs = MockJob.find_jobs_with_reference
     existing_jobs.size.should == number      
     existing_jobs.first.reference.should == '1'
     existing_jobs.first.attributes.
@@ -65,12 +68,13 @@ describe RemoteJobs do
       
     context "the remote job matches one in the local database" do
       it "updates the existing job using the remote attributes" do
-        update_setup(1, 1)
+        update_setup(1, 1, 0)
         verify_test_database
         
         MockJob.sync_with('remote_url') { MockJob.find }
         
-        updated_jobs = MockJob.find      
+        MockJob.find.size.should == 1
+        updated_jobs = MockJob.find_jobs_with_reference      
         updated_jobs.size.should == 1      
         updated_jobs.first.reference.should == '1'
         updated_jobs.first.attributes.
@@ -78,13 +82,14 @@ describe RemoteJobs do
       end      
 
       it "only updates the referenced job using the remote attributes" do
-        update_setup(1, 3)
-        verify_test_database(3)
+        update_setup(1, 1, 2)
+        verify_test_database(1)
 
         MockJob.sync_with('remote_url') { MockJob.find }
 
-        updated_jobs = MockJob.find
-        updated_jobs.size.should == 3      
+        MockJob.find.size.should == 3
+        updated_jobs = MockJob.find_jobs_with_reference
+        updated_jobs.size.should == 1      
         updated_jobs.first.reference.should == '1'
         updated_jobs.first.attributes.
           should == { reference: '1', title: 'job title 1' }
@@ -93,13 +98,13 @@ describe RemoteJobs do
     
     context "the remote job does not match anything in the local database" do
       it "adds the new job to the database using the remote attributes" do
-        local_jobs_fixtures(2)                                      
-        verify_test_database(2)
+        update_setup(1, 1)                                      
+        verify_test_database(1)
         MockJob.stub(:find_remote_jobs).
           and_return({'5' => {reference: '5', title: 'job title 5'}})      
 
         MockJob.sync_with('remote_url') { MockJob.find }
-        MockJob.find.size.should == 3      
+        MockJob.find.size.should == 2      
       end
     end      
   end                                      
