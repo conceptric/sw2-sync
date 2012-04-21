@@ -11,7 +11,7 @@ module RemoteJobs
     end
     
     def sync_with(remote_url, &block)
-      find_remote_jobs(remote_url).each do |job_attr|
+      find_remote_jobs(remote_url).each do |job_ref, job_attr|
         self.create(job_attr)
       end      
     end

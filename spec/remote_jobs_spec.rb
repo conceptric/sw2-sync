@@ -26,13 +26,13 @@ end
 
 class MockRemoteXmlReader  
   def child_nodes_to_hash(node_name)
-    [{reference:'1', title: 'job title'}]
+    {'1'=>{ title: 'job title 1' }}
   end  
 end
 
 class MockEmptyRemoteXmlReader  
   def child_nodes_to_hash(node_name)
-    []
+    {}
   end  
 end
 
@@ -41,9 +41,9 @@ describe RemoteJobs do
   describe "Jobs that exist remotely but not locally" do
 
     def stub_remote_jobs(how_many)
-      jobs = []
+      jobs = {}
       how_many.times do |i| 
-        jobs << {reference:"#{i+1}", title: 'job title'}
+        jobs["#{i+1}"]= { title: "job title #{i+1}" }
       end
       MockJob.stub(:find_remote_jobs).
         and_return(jobs)      
@@ -59,8 +59,7 @@ describe RemoteJobs do
       MockJob.sync_with('remote_url') { MockJob.find }
       jobs = MockJob.find
       jobs.size.should == 1
-      jobs.first.attributes.
-        should == {reference:'1', title: 'job title'}
+      jobs.first.attributes.should == { title: 'job title 1' }
     end
 
     it "create two new jobs using the remote attributes" do
@@ -68,8 +67,8 @@ describe RemoteJobs do
       MockJob.sync_with('remote_url') { MockJob.find }
       jobs = MockJob.find
       jobs.size.should == 2
-      jobs.first.attributes.should == {reference:'1', title: 'job title'}
-      jobs.last.attributes.should == {reference:'2', title: 'job title'}
+      jobs.first.attributes.should == { title: 'job title 1' }
+      jobs.last.attributes.should == { title: 'job title 2' }
     end                                                     
     
   end
@@ -131,13 +130,13 @@ describe "RemoteJobs Interfaces" do
     end
     
     it "takes a remote url and returns an array" do
-      subject.should be_instance_of Array 
+      subject.should be_instance_of Hash 
     end
 
     context "when there are remote jobs" do
       it "of job attributes to be synchronised with the local database" do            
         subject.size.should_not == 0
-        subject.each {|job| job.should be_instance_of Hash}
+        subject.each {|reference, job| job.should be_instance_of Hash}
       end
     end
 
