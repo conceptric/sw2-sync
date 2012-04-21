@@ -21,8 +21,8 @@ class MockJob
   end
 
   def self.find_by_reference(id)
-    referenced_job = []
-    @@jobs.each {|job| referenced_job << job if job.reference == id }
+    referenced_job = nil
+    @@jobs.each {|job| referenced_job = job if job.reference == id }
     referenced_job
   end
   

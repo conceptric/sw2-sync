@@ -17,11 +17,11 @@ module RemoteJobs
     end    
     
     def create_or_update(reference, attributes)
-      jobs = self.find_by_reference(reference)
-      if jobs.empty? then
+      job = self.find_by_reference(reference)
+      if job == nil then
         self.create(attributes)
-      elsif jobs.size == 1
-        jobs.first.update_attributes(attributes)
+      else
+        job.update_attributes(attributes)
       end      
     end
   end
