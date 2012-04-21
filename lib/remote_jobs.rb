@@ -11,7 +11,13 @@ module RemoteJobs
     end
     
     def sync_with(remote_url, &block)
-      find_remote_jobs(remote_url).each do |job_ref, job_attr|
+      remote_jobs = find_remote_jobs(remote_url)
+      
+      find_jobs_with_reference.each do |job|
+        job.unpublish unless remote_jobs.has_key? job.reference
+      end                                                   
+      
+      remote_jobs.each do |job_ref, job_attr|
         create_or_update(job_ref, job_attr)
       end      
     end    

@@ -3,11 +3,12 @@ class MockJob
 
   @@jobs = []
     
-  attr_reader :attributes, :reference
-  attr_writer :attributes
+  attr_reader :attributes, :reference, :publish
+  attr_writer :attributes, :publish
   
   def initialize(attributes)
     @reference = attributes[:reference]
+    @publish = true
     @attributes = attributes
   end
 
@@ -18,6 +19,10 @@ class MockJob
   # Provided by activerecord or to be included in the module?
   def update_attributes(attributes)
     @@jobs.first.attributes = attributes
+  end
+
+  def unpublish
+    self.publish = false
   end
 
   def self.find_jobs_with_reference

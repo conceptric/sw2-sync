@@ -29,9 +29,6 @@ describe RemoteJobs do
   def verify_test_database(number=1)
     existing_jobs = MockJob.find_jobs_with_reference
     existing_jobs.size.should == number      
-    existing_jobs.first.reference.should == '1'
-    existing_jobs.first.attributes.
-      should == { reference: '1', title: 'job title 2' }       
   end                                                       
 
   describe "Jobs that exist remotely with an empty local database" do
@@ -43,7 +40,7 @@ describe RemoteJobs do
     
     it "create a new job using the remote attributes" do
       stub_remote_jobs(1)
-      MockJob.sync_with('remote_url') { MockJob.find }
+      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
       jobs = MockJob.find
       jobs.size.should == 1
       jobs.first.attributes.should == { reference: '1', title: 'job title 1' }
@@ -51,7 +48,7 @@ describe RemoteJobs do
 
     it "create two new jobs using the remote attributes" do
       stub_remote_jobs(2)
-      MockJob.sync_with('remote_url') { MockJob.find }
+      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
       jobs = MockJob.find
       jobs.size.should == 2
       jobs.first.attributes.should == { reference: '1', title: 'job title 1' }
@@ -71,7 +68,7 @@ describe RemoteJobs do
         update_setup(1, 1, 0)
         verify_test_database
         
-        MockJob.sync_with('remote_url') { MockJob.find }
+        MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
         
         MockJob.find.size.should == 1
         updated_jobs = MockJob.find_jobs_with_reference      
@@ -85,7 +82,7 @@ describe RemoteJobs do
         update_setup(1, 1, 2)
         verify_test_database(1)
 
-        MockJob.sync_with('remote_url') { MockJob.find }
+        MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
 
         MockJob.find.size.should == 3
         updated_jobs = MockJob.find_jobs_with_reference
@@ -98,19 +95,75 @@ describe RemoteJobs do
     
     context "the remote job does not match anything in the local database" do
       it "adds the new job to the database using the remote attributes" do
-        update_setup(1, 1)                                      
-        verify_test_database(1)
+        update_setup(1, 0, 1)                                      
+        verify_test_database(0)
         MockJob.stub(:find_remote_jobs).
           and_return({'5' => {reference: '5', title: 'job title 5'}})      
 
-        MockJob.sync_with('remote_url') { MockJob.find }
+        MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
         MockJob.find.size.should == 2      
       end
     end      
   end                                      
 
   describe "Jobs that no longer exist in the remote source" do
-    it "mark the job as not to be published"
+    
+    def setup_delete_specs(sync, static=0)
+      local_jobs_fixtures(sync, static) 
+      verify_test_database(sync)      
+    end                        
+    
+    before(:each) do
+      MockJob.reset      
+    end    
+    
+    it "mark the job as not to be published" do        
+      setup_delete_specs(1)
+      MockJob.stub(:find_remote_jobs).and_return({})      
+
+      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+
+      MockJob.find_jobs_with_reference.size.should == 1
+      MockJob.find_jobs_with_reference.first.publish.should be_false            
+    end
+
+    it "mark all the jobs as not to be published" do        
+      setup_delete_specs(3)
+      MockJob.stub(:find_remote_jobs).and_return({})      
+
+      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+
+      remote_jobs = MockJob.find_jobs_with_reference
+      remote_jobs.size.should == 3
+      remote_jobs.each do |job|
+        job.publish.should be_false            
+      end      
+    end
+    
+    it "only mark those as not to be published" do        
+      setup_delete_specs(2)
+      MockJob.stub(:find_remote_jobs).
+        and_return({'1' => {reference: '1', title: 'job title 2'}})      
+
+      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+
+      MockJob.find_jobs_with_reference.size.should == 2
+      MockJob.find_by_reference('1').publish.should be_true            
+      MockJob.find_by_reference('2').publish.should be_false            
+    end
+        
+    it "jobs without a reference should not be affected" do        
+      setup_delete_specs(0, 2)
+      MockJob.stub(:find_remote_jobs).and_return({})      
+
+      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+
+      jobs = MockJob.find
+      jobs.size.should == 2
+      jobs.each do |job|
+        job.publish.should be_true            
+      end      
+    end    
   end
 
   describe "Remote attributes cause validation errors" do
