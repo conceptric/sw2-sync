@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<jobs>
+  <item>
+    <reference>001</reference>
+    <title>A simple job</title>
+    <category></category>
+    <jobtype>Permanent</jobtype>
+    <startdate>14 March 2012</startdate>
+    <enddate>15 March 2012</enddate>
+    <duration></duration>
+    <pubDate></pubDate>
+		<salary>£15,000</salary>
+    <location>UK</location>
+    <joboftheweek>0</joboftheweek>
+    <contactname>Example Recruiter</contactname>
+    <contactemail>recruiter@example.com</contactemail>
+    <description><![CDATA[This is a very simple example of a job\nIt also contains special characters.]]></description>
+  </item>
+</jobs>

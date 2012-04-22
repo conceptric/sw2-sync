@@ -45,4 +45,9 @@ class MockJob
   def self.create(attributes)
     @@jobs << self.new(attributes)
   end                                 
+
+  def self._accessible_attributes
+    {:default => ["reference", "contactemail", "contactname", "description", "jobtype", "location", "salary", "title"]}
+  end
+  
 end

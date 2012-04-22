@@ -34,36 +34,41 @@ describe "RemoteJobs Interfaces" do
   end
   
   describe ".find_remote_jobs" do
+    SW2_FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures sw2])
 
-    subject { MockJob.find_remote_jobs('remote_url') }
-
-    before(:each) do 
-      RemoteXmlReader.stub(:new).with('remote_url').
-        and_return(MockRemoteXmlReader.new)            
+    def sw2_xml_reader_setup(filename)
+      xml_file = open(SW2_FIXTURES + '/' + filename)
+      RemoteXmlReader.stub(:open).and_return(xml_file)      
+      MockJob.find_remote_jobs('remote_url')
     end
     
     it "takes a remote url and returns an array" do
-      subject.should be_instance_of Hash 
+      remote_jobs = sw2_xml_reader_setup('sw2_xml_api.xml')
+      remote_jobs.should be_instance_of Hash 
     end
-
-    context "when there are remote jobs" do
-      it "of job attributes to be synchronised with the local database" do            
-        subject.size.should_not == 0
-        subject.each {|reference, job| job.should be_instance_of Hash}
-      end
-    end
-
+    
     context "when there aren't any remote jobs" do     
-      before(:each) do 
-        RemoteXmlReader.stub(:new).with('remote_url').
-          and_return(MockEmptyRemoteXmlReader.new)            
-      end
-
       it "returns an empty array" do            
-        subject.size.should == 0
+        remote_jobs = sw2_xml_reader_setup('sw2_xml_api.xml')
+        remote_jobs.size.should == 0
       end
     end    
-
+    
+    context "when there are remote jobs" do
+      it "of job attributes to be synchronised with the local database" do            
+        remote_jobs = sw2_xml_reader_setup('sw2_single_job_example.xml')
+        remote_jobs.size.should_not == 0
+        remote_jobs.each {|reference, job| job.should be_instance_of Hash}
+      end          
+      
+      it "hash attributes that are not present in the Model are removed" do
+        remote_jobs = sw2_xml_reader_setup('sw2_single_job_example.xml')
+        remote_jobs.each do |reference, job| 
+          job_keys = job.keys.collect! {|key| key.to_s}
+          job_keys.sort.should == MockJob._accessible_attributes[:default].sort
+        end
+      end      
+    end
   end  
  
 end

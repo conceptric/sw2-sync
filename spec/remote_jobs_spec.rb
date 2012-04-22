@@ -165,7 +165,7 @@ describe RemoteJobs do
       end      
     end    
   end
-
+  
   describe "Remote attributes cause validation errors" do
     it "leaves the local job unchanged and writes an error to the log"
   end
