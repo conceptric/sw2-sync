@@ -25,7 +25,7 @@ class MockJob
     self.publish = false
   end
 
-  def self.find_jobs_with_reference
+  def self.find_remotely_referenced_jobs
     remote_jobs = []
     @@jobs.each {|job| remote_jobs << job unless job.reference == nil }
     remote_jobs    

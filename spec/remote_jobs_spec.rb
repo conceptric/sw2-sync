@@ -27,7 +27,7 @@ describe RemoteJobs do
   end
   
   def verify_test_database(number=1)
-    existing_jobs = MockJob.find_jobs_with_reference
+    existing_jobs = MockJob.find_remotely_referenced_jobs
     existing_jobs.size.should == number      
   end                                                       
 
@@ -40,7 +40,7 @@ describe RemoteJobs do
     
     it "create a new job using the remote attributes" do
       stub_remote_jobs(1)
-      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+      MockJob.sync_with('remote_url')
       jobs = MockJob.find
       jobs.size.should == 1
       jobs.first.attributes.should == { reference: '1', title: 'job title 1' }
@@ -48,7 +48,7 @@ describe RemoteJobs do
 
     it "create two new jobs using the remote attributes" do
       stub_remote_jobs(2)
-      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+      MockJob.sync_with('remote_url')
       jobs = MockJob.find
       jobs.size.should == 2
       jobs.first.attributes.should == { reference: '1', title: 'job title 1' }
@@ -68,10 +68,10 @@ describe RemoteJobs do
         update_setup(1, 1, 0)
         verify_test_database
         
-        MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+        MockJob.sync_with('remote_url')
         
         MockJob.find.size.should == 1
-        updated_jobs = MockJob.find_jobs_with_reference      
+        updated_jobs = MockJob.find_remotely_referenced_jobs      
         updated_jobs.size.should == 1      
         updated_jobs.first.reference.should == '1'
         updated_jobs.first.attributes.
@@ -82,10 +82,10 @@ describe RemoteJobs do
         update_setup(1, 1, 2)
         verify_test_database(1)
 
-        MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+        MockJob.sync_with('remote_url')
 
         MockJob.find.size.should == 3
-        updated_jobs = MockJob.find_jobs_with_reference
+        updated_jobs = MockJob.find_remotely_referenced_jobs
         updated_jobs.size.should == 1      
         updated_jobs.first.reference.should == '1'
         updated_jobs.first.attributes.
@@ -100,7 +100,7 @@ describe RemoteJobs do
         MockJob.stub(:find_remote_jobs).
           and_return({'5' => {reference: '5', title: 'job title 5'}})      
 
-        MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+        MockJob.sync_with('remote_url')
         MockJob.find.size.should == 2      
       end
     end      
@@ -121,19 +121,19 @@ describe RemoteJobs do
       setup_delete_specs(1)
       MockJob.stub(:find_remote_jobs).and_return({})      
 
-      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+      MockJob.sync_with('remote_url')
 
-      MockJob.find_jobs_with_reference.size.should == 1
-      MockJob.find_jobs_with_reference.first.publish.should be_false            
+      MockJob.find_remotely_referenced_jobs.size.should == 1
+      MockJob.find_remotely_referenced_jobs.first.publish.should be_false            
     end
 
     it "mark all the jobs as not to be published" do        
       setup_delete_specs(3)
       MockJob.stub(:find_remote_jobs).and_return({})      
 
-      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+      MockJob.sync_with('remote_url')
 
-      remote_jobs = MockJob.find_jobs_with_reference
+      remote_jobs = MockJob.find_remotely_referenced_jobs
       remote_jobs.size.should == 3
       remote_jobs.each do |job|
         job.publish.should be_false            
@@ -145,9 +145,9 @@ describe RemoteJobs do
       MockJob.stub(:find_remote_jobs).
         and_return({'1' => {reference: '1', title: 'job title 2'}})      
 
-      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+      MockJob.sync_with('remote_url')
 
-      MockJob.find_jobs_with_reference.size.should == 2
+      MockJob.find_remotely_referenced_jobs.size.should == 2
       MockJob.find_by_reference('1').publish.should be_true            
       MockJob.find_by_reference('2').publish.should be_false            
     end
@@ -156,7 +156,7 @@ describe RemoteJobs do
       setup_delete_specs(0, 2)
       MockJob.stub(:find_remote_jobs).and_return({})      
 
-      MockJob.sync_with('remote_url') { MockJob.find_jobs_with_reference }
+      MockJob.sync_with('remote_url')
 
       jobs = MockJob.find
       jobs.size.should == 2
@@ -167,7 +167,8 @@ describe RemoteJobs do
   end
   
   describe "Remote attributes cause validation errors" do
-    it "leaves the local job unchanged and writes an error to the log"
+    it "leaves the local job unchanged catching errors"
+    it "and writes an error to the log"
   end
   
 end
