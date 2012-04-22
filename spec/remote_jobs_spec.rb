@@ -163,12 +163,19 @@ describe RemoteJobs do
       jobs.each do |job|
         job.publish.should be_true            
       end      
-    end    
+    end
+        
   end
   
   describe "Remote attributes cause validation errors" do
-    it "leaves the local job unchanged catching errors"
-    it "and writes an error to the log"
+    
+    it "leaves the local job unchanged catching errors" do
+      MockJob.stub(:create).and_raise(StandardError)
+      MockJob.stub(:find_remote_jobs).
+        and_return({'1' => {reference: '1', title: 'job title 2'}})      
+      expect { MockJob.sync_with('remote_url') }.should_not raise_error
+    end
+
   end
   
 end

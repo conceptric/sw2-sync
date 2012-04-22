@@ -30,11 +30,14 @@ module RemoteJobs
     private
     def create_or_update(reference, attributes)
       job = self.find_by_reference(reference)
-      if job == nil then
-        self.create(attributes)
-      else
-        job.update_attributes(attributes)
-      end      
+      begin
+        if job == nil then
+          self.create(attributes)
+        else
+          job.update_attributes(attributes)
+        end      
+      rescue StandardError        
+      end
     end 
     
     def mass_assignment_cleanup(job)
