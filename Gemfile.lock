@@ -1,5 +1,12 @@
+PATH
+  remote: .
+  specs:
+    sw2-sync (0.0.1)
+      nokogiri
+      rake
+
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.3)
     nokogiri (1.5.2)
@@ -17,6 +24,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  nokogiri
-  rake
   rspec
+  sw2-sync!

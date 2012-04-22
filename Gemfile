@@ -1,5 +1,4 @@
-source "https://rubygems.org"
+source "http://rubygems.org"
 
-gem 'rake'
-gem 'nokogiri'
-gem "rspec", :group => :development
+# Specify your gem's dependencies in cyberpress.gemspec
+gemspec
