@@ -1,5 +1,4 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib remote_jobs.rb])
-require File.join(File.dirname(__FILE__), *%w[mocks mock_remote_xml_reader.rb])
 require File.join(File.dirname(__FILE__), *%w[mocks mock_job.rb])
 
 RSpec.configure do |config|
