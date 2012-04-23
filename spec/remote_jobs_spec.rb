@@ -124,7 +124,7 @@ describe RemoteJobs do
       MockJob.sync_with('remote_url')
 
       MockJob.find_remotely_referenced_jobs.size.should == 1
-      MockJob.find_remotely_referenced_jobs.first.publish.should be_false            
+      MockJob.find_remotely_referenced_jobs.first.published.should be_false            
     end
 
     it "mark all the jobs as not to be published" do        
@@ -136,7 +136,7 @@ describe RemoteJobs do
       remote_jobs = MockJob.find_remotely_referenced_jobs
       remote_jobs.size.should == 3
       remote_jobs.each do |job|
-        job.publish.should be_false            
+        job.published.should be_false            
       end      
     end
     
@@ -148,8 +148,8 @@ describe RemoteJobs do
       MockJob.sync_with('remote_url')
 
       MockJob.find_remotely_referenced_jobs.size.should == 2
-      MockJob.find_by_reference('1').publish.should be_true            
-      MockJob.find_by_reference('2').publish.should be_false            
+      MockJob.find_by_reference('1').published.should be_true            
+      MockJob.find_by_reference('2').published.should be_false            
     end
         
     it "jobs without a reference should not be affected" do        
@@ -161,7 +161,7 @@ describe RemoteJobs do
       jobs = MockJob.find
       jobs.size.should == 2
       jobs.each do |job|
-        job.publish.should be_true            
+        job.published.should be_true            
       end      
     end
         

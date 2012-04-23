@@ -3,12 +3,12 @@ class MockJob
 
   @@jobs = []
     
-  attr_reader :attributes, :reference, :publish
-  attr_writer :attributes, :publish
+  attr_reader :attributes, :reference, :published
+  attr_writer :attributes, :published
   
   def initialize(attributes)
     @reference = attributes[:reference]
-    @publish = true
+    @published = true
     @attributes = attributes
   end
 
@@ -22,7 +22,7 @@ class MockJob
   end
 
   def unpublish
-    self.publish = false
+    self.published = false
   end
 
   def self.find_remotely_referenced_jobs
