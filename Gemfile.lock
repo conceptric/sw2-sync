@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sw2-sync (0.0.1)
+    sw2-sync (0.0.2)
       nokogiri
       rake
 

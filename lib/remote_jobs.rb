@@ -1,5 +1,3 @@
-require 'remote_xml_reader'
-
 module RemoteJobs
   module ClassMethods
     def find_jobs_to_sync(&block)

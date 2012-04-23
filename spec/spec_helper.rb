@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), *%w[.. lib remote_jobs.rb])
+require File.join(File.dirname(__FILE__), *%w[.. lib sw2-sync.rb])
 require File.join(File.dirname(__FILE__), *%w[mocks mock_job.rb])
 
 RSpec.configure do |config|
