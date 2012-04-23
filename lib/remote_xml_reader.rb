@@ -1,12 +1,13 @@
+require 'open-uri'
 require 'nokogiri'         
                                              
 class RemoteXmlReader                                    
   def self.open(remote_url)
     raise ArgumentError, "A URI is required" unless remote_url
     begin
-      open(remote_url)      
-    rescue NoMethodError, SystemStackError
-      raise ArgumentError, "This URI is invalid", caller
+      Kernel.open(remote_url)      
+    rescue Errno::ENOENT
+      raise ArgumentError, "This URI is invalid"
     end
   end
 

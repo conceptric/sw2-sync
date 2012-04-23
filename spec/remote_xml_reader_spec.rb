@@ -44,6 +44,11 @@ describe RemoteXmlReader do
         expect { RemoteXmlReader.open('blank') }.
           should_not raise_error
       end
+      
+      it "opens a real url" do
+        expect {RemoteXmlReader.open('http://www.job-tv.co.uk/XML.asp')}.
+        should_not raise_error
+      end
     end
 
     context "a remote url that does not exist" do
