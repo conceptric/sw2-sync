@@ -38,7 +38,7 @@ describe "RemoteJobs Interfaces" do
 
     def sw2_xml_reader_setup(filename)
       xml_file = open(SW2_FIXTURES + '/' + filename)
-      RemoteXmlReader.stub(:open).and_return(xml_file)      
+      Remote::Xml::Reader.stub(:open).and_return(xml_file)      
       MockJob.find_remote_jobs('remote_url')
     end
     

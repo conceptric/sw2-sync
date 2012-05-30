@@ -1,2 +1,2 @@
-require 'remote_xml_reader'
+require 'remote-xml-reader'
 require 'remote_jobs'

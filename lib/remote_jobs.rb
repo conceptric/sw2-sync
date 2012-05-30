@@ -6,7 +6,7 @@ module RemoteJobs
     
     def find_remote_jobs(remote_url)                             
       jobs = {}
-      RemoteXmlReader.new(remote_url).child_nodes_to_hash('jobs').each do |job|
+      Remote::Xml::Reader.new(remote_url).child_nodes_to_hash('jobs').each do |job|
         clean_job = mass_assignment_cleanup(job)
         jobs[clean_job[:reference]] = clean_job unless clean_job[:reference] == ''
       end                        
