@@ -7,8 +7,11 @@ require File.join(PROJECT_ROOT, *%w[spec mocks mock_job.rb])
 Dir[File.join(PROJECT_ROOT, "spec/support/**/*.rb")].each {|f| require f}
 
 RSpec.configure do |config|
+
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
   config.include JobMacros
+  config.include RemoteInterfaceMacros
+
 end

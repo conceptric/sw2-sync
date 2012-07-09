@@ -1,11 +1,12 @@
-class MockJob                             
+class MockJob
   include RemoteJobs
 
+  # Represents the Jobs in the application database
   @@jobs = []
-    
+
   attr_reader :attributes, :reference, :published
   attr_writer :attributes, :published
-  
+
   def initialize(attributes)
     @reference = attributes[:reference]
     @published = true
@@ -24,10 +25,10 @@ class MockJob
   def self.find_remotely_referenced_jobs
     remote_jobs = []
     @@jobs.each {|job| remote_jobs << job unless job.reference == nil }
-    remote_jobs    
+    remote_jobs
   end
 
-  # Provided by ActiveRecord
+  # Methods that are provided by ActiveRecord
   def self.find
     @@jobs
   end
@@ -37,10 +38,10 @@ class MockJob
     @@jobs.each {|job| referenced_job = job if job.reference == id }
     referenced_job
   end
-  
+
   def self.create(attributes)
     @@jobs << self.new(attributes)
-  end                                 
+  end
 
   def update_attributes(attributes)
     @@jobs.first.attributes = attributes
@@ -49,5 +50,5 @@ class MockJob
   def self._accessible_attributes
     {:default => ["reference", "contactemail", "contactname", "description", "jobtype", "location", "salary", "title"]}
   end
-  
+
 end
