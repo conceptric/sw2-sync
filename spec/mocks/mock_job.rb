@@ -3,6 +3,7 @@ class MockJob
 
   # Represents the Jobs in the application database
   @@jobs = []
+  @@default_attributes = []
 
   attr_reader :attributes, :reference, :published
   attr_writer :attributes, :published
@@ -15,6 +16,10 @@ class MockJob
 
   def self.reset
     @@jobs = []
+  end
+
+  def self.set_attributes_list(attributes_list)
+    @@default_attributes = attributes_list
   end
 
   # Need to be provided in the Model (include in the module?)
@@ -48,7 +53,9 @@ class MockJob
   end
 
   def self._accessible_attributes
-    {:default => ["reference", "contactemail", "contactname", "description", "jobtype", "location", "salary", "title"]}
+    {
+      :default => @@default_attributes
+    }
   end
 
 end

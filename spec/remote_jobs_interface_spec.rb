@@ -41,6 +41,10 @@ end
 
 describe "RemoteJobs interfaces with the remote source" do
 
+  let(:sw2_keys) { ["reference", "contactemail",
+        "contactname", "description", "jobtype",
+        "location", "salary", "title"] }
+
   describe ".find_remote_jobs" do
 
     SW2_FIXTURES = File.join(File.dirname(__FILE__), *%w[fixtures sw2])
@@ -51,6 +55,7 @@ describe "RemoteJobs interfaces with the remote source" do
 
       before(:each) do
         sw2_xml_reader_setup('sw2_xml_api.xml')
+        MockJob.set_attributes_list(sw2_keys)
       end
 
       it "returns a hash" do
@@ -77,11 +82,63 @@ describe "RemoteJobs interfaces with the remote source" do
         subject.each {|reference, job| job.should be_instance_of Hash}
       end
 
-      it "removes job keys and value from the hash not defined by the Job model" do
-        subject.each do |reference, job|
-          job_keys = job.keys.collect! {|key| key.to_s}
-          job_keys.sort.should == MockJob._accessible_attributes[:default].sort
+      describe "hash attributes are defined by the local Model attributes" do
+
+        it "MockJob returns a complete set of attributes for SW2" do
+          MockJob.set_attributes_list(sw2_keys)
+          MockJob._accessible_attributes[:default].sort.should == sw2_keys.sort
         end
+
+        it "Mockjob returns the attribute list that I set" do
+          attribute_list = sw2_keys.first(3)
+          MockJob.set_attributes_list(attribute_list)
+          MockJob._accessible_attributes[:default].sort.should == attribute_list.sort
+        end
+
+        context "when all the Model attributes match the hash keys" do
+
+          it "hash attributes match the Model attributes" do
+            MockJob.set_attributes_list(sw2_keys)
+            subject.each do |reference, job|
+              job_keys = job.keys.collect! {|key| key.to_s}
+              job_keys.sort.should == MockJob._accessible_attributes[:default].sort
+            end
+          end
+
+        end
+
+        context "when the Model attributes are a subset of the hash keys" do
+
+          it "removes the extra keys from the hashes" do
+            attribute_list = sw2_keys.first(3)
+            MockJob.set_attributes_list(attribute_list)
+            subject.each do |reference, job|
+              job_keys = job.keys.collect! {|key| key.to_s}
+              job_keys.sort.should == attribute_list.sort
+            end
+          end
+
+        end
+
+        context "when the Model contains attributes not in the hash keys" do
+
+          let(:attribute_list) { sw2_keys << 'missing' }
+
+          it "the missing attribute is added to the MockJob attributes" do
+            MockJob.set_attributes_list(attribute_list)
+            MockJob._accessible_attributes[:default].should include 'missing'
+          end
+
+          it "the missing attribute is ignored in the hashes" do
+            MockJob.set_attributes_list(attribute_list)
+            subject.each do |reference, job|
+              job_keys = job.keys.collect! {|key| key.to_s}
+              job_keys.should_not include 'missing'
+            end
+          end
+
+        end
+
       end
 
     end
