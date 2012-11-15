@@ -33,6 +33,7 @@ module RemoteJobs
           self.create(attributes)
         else
           job.update_attributes(attributes)
+          job.published = true
         end      
       rescue StandardError        
       end

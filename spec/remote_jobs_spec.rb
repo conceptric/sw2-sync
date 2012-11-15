@@ -57,7 +57,20 @@ describe RemoteJobs do
         updated_jobs.first.reference.should == '1'
         updated_jobs.first.attributes.
           should == { reference: '1', title: 'job title 1' }
-      end      
+      end
+      
+      it "republishes an unpublished job once it is updated" do
+        update_setup(1, 1, 0)
+        verify_test_database
+        
+        existing_jobs = MockJob.find_remotely_referenced_jobs      
+        existing_jobs.first.unpublish        
+        existing_jobs.first.published.should be_false
+        
+        MockJob.sync_with('remote_url')
+        updated_jobs = MockJob.find_remotely_referenced_jobs      
+        updated_jobs.first.published.should be_true
+      end            
 
       it "only updates the referenced job using the remote attributes" do
         update_setup(1, 1, 2)
@@ -71,7 +84,7 @@ describe RemoteJobs do
         updated_jobs.first.reference.should == '1'
         updated_jobs.first.attributes.
           should == { reference: '1', title: 'job title 1' }
-      end
+      end      
     end
     
     context "the remote job does not match anything in the local database" do
@@ -154,7 +167,7 @@ describe RemoteJobs do
       MockJob.stub(:create).and_raise(StandardError)
       MockJob.stub(:find_remote_jobs).
         and_return({'1' => {reference: '1', title: 'job title 2'}})      
-      expect { MockJob.sync_with('remote_url') }.should_not raise_error
+      expect { MockJob.sync_with('remote_url') }.to_not raise_error
     end
 
   end

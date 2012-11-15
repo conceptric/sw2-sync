@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "sw2-sync"
-  s.version     = "0.0.3"
+  s.version     = "0.0.5"
   s.authors     = ["James Whinfrey"]
   s.email       = ["james@conceptric.co.uk"]
   s.homepage    = ""
